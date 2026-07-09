@@ -12,6 +12,5 @@ export interface DashboardResponse {
   totalCustomers: number;
   lowStockCount: number;
   currentStockValue: number;
-
   recentInvoices: RecentInvoice[];
 }
