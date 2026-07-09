@@ -1,21 +1,25 @@
 "use client";
 
+import DashboardCards from "@/components/dashboard/DashboardCards";
+import RecentInvoices from "@/components/dashboard/RecentInvoices";
 import { useDashboard } from "@/hooks/useDashboard";
 
 export default function DashboardPage() {
-  const { data, isLoading, error } = useDashboard();
+  const { data, loading } = useDashboard();
 
-  if (isLoading) return <h2 className="p-10">Loading...</h2>;
+  if (loading)
+    return <div>Loading...</div>;
 
-  if (error) return <h2 className="p-10">Unable to connect API</h2>;
+  if (!data)
+    return <div>Unable to connect API</div>;
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="space-y-8">
+      <DashboardCards data={data} />
 
-      <pre className="rounded-lg bg-black p-5 text-white overflow-auto">
-        {JSON.stringify(data, null, 2)}
-      </pre>
-
+      <RecentInvoices
+        invoices={data.recentInvoices}
+      />
     </div>
   );
 }

@@ -1,11 +1,21 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { DashboardResponse } from "@/types/dashboard";
 import { getDashboard } from "@/services/dashboard.service";
 
-export const useDashboard = () => {
-  return useQuery({
-    queryKey: ["dashboard"],
-    queryFn: getDashboard,
-  });
-};
+export function useDashboard() {
+  const [data, setData] = useState<DashboardResponse>();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getDashboard()
+      .then(setData)
+      .finally(() => setLoading(false));
+  }, []);
+
+  return {
+    data,
+    loading,
+  };
+}
