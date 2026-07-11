@@ -38,25 +38,20 @@ export function logout() {
 }
 
 export function isTokenExpired() {
-  const token = getToken();
+  if (typeof window === "undefined") return true;
 
+  const token = getToken();
   if (!token) return true;
 
   try {
     const decoded = jwtDecode<JwtPayload>(token);
 
     if (decoded.exp) {
-      return decoded.exp * 1000 < Date.now();
+      return decoded.exp * 1000 <= Date.now();
     }
   } catch {
-    // Fall back to login timestamp if token is malformed or missing exp.
+    return true;
   }
 
-  const loginTime = localStorage.getItem(LOGIN_TIME_KEY);
-  if (!loginTime) return true;
-
-  const loginTimestamp = Number(loginTime);
-  if (Number.isNaN(loginTimestamp)) return true;
-
-  return Date.now() - loginTimestamp > SESSION_TIMEOUT;
+  return true;
 }
