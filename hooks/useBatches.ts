@@ -1,48 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-import { getBatches } from "@/services/batch.service";
-
 import { Batch } from "@/types/batch";
+import {
+  getMedicine,
+  getMedicineBatches,
+} from "@/services/batch.service";
 
-export function useBatches(
-  medicineId: string
-) {
-
-  const [batches, setBatches] =
-    useState<Batch[]>([]);
-
-  const [loading, setLoading] =
-    useState(true);
+export function useBatches(id: string) {
+  const [medicine, setMedicine] = useState<any>(null);
+  const [batches, setBatches] = useState<Batch[]>([]);
+  const [loading, setLoading] = useState(true);
 
   async function load() {
-
     setLoading(true);
 
-    const data =
-      await getBatches(medicineId);
+    try {
+      const [med, list] = await Promise.all([
+        getMedicine(id),
+        getMedicineBatches(id),
+      ]);
 
-    setBatches(data);
-
-    setLoading(false);
-
+      setMedicine(med);
+      setBatches(list);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
-
-    load();
-
-  }, [medicineId]);
+    if (id) load();
+  }, [id]);
 
   return {
-
+    medicine,
     batches,
-
     loading,
-
     refresh: load,
-
   };
-
 }
