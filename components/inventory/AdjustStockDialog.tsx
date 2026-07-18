@@ -3,30 +3,18 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-import BatchForm from "./BatchForm";
-
-import {
-  createBatch,
-  updateBatch,
-} from "@/services/batch.service";
-
-import {
-  Batch,
-  CreateBatchRequest,
-} from "@/types/batch";
+import AdjustStockForm from "./AdjustStockForm";
+import { adjustStock } from "@/services/inventory.service";
+import { AdjustStockRequest } from "@/types/inventory";
 
 interface Props {
-  medicineId: string;
   open: boolean;
-  batch?: Batch | null;
   onClose: () => void;
   onSaved: () => void;
 }
 
-export default function AddBatchDialog({
-  medicineId,
+export default function AdjustStockDialog({
   open,
-  batch,
   onClose,
   onSaved,
 }: Props) {
@@ -35,24 +23,16 @@ export default function AddBatchDialog({
 
   if (!open) return null;
 
-  async function save(data: CreateBatchRequest) {
+  async function save(
+    data: AdjustStockRequest
+  ) {
     setLoading(true);
 
     try {
-      if (batch) {
-        await updateBatch(
-          medicineId,
-          batch.id,
-          data
-        );
-      } else {
-        await createBatch(
-          medicineId,
-          data
-        );
-      }
+      await adjustStock(data);
 
       onSaved();
+
       onClose();
     } finally {
       setLoading(false);
@@ -62,12 +42,12 @@ export default function AddBatchDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
 
-      <div className="w-full max-w-lg rounded-xl bg-white p-6">
+      <div className="w-full max-w-xl rounded-xl bg-white p-6">
 
         <div className="mb-5 flex items-center justify-between">
 
           <h2 className="text-xl font-semibold">
-            {batch ? "Edit Batch" : "Add Batch"}
+            Adjust Stock
           </h2>
 
           <button onClick={onClose}>
@@ -76,8 +56,7 @@ export default function AddBatchDialog({
 
         </div>
 
-        <BatchForm
-          batch={batch}
+        <AdjustStockForm
           loading={loading}
           onSubmit={save}
         />

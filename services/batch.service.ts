@@ -1,40 +1,21 @@
-import { getToken } from "@/lib/auth";
 import api from "@/lib/axios";
-import { Batch , CreateBatchRequest } from "@/types/batch";
-
-const API = process.env.NEXT_PUBLIC_API_URL;
-
-function headers() {
-  return {
-    Authorization: `Bearer ${getToken()}`,
-    "Content-Type": "application/json",
-  };
-}
+import { Batch, CreateBatchRequest } from "@/types/batch";
 
 export async function getMedicine(id: string) {
-  const res = await fetch(`${API}/api/medicines/${id}`, {
-    headers: headers(),
-  });
-
-  if (!res.ok)
-    throw new Error("Unable to load medicine");
-
-  return res.json();
+  const { data } = await api.get(`/api/medicines/${id}`);
+  return data;
 }
 
-export async function getMedicineBatches(id: string): Promise<Batch[]> {
-  const res = await fetch(
-    `${API}/api/medicines/${id}/batches`,
-    {
-      headers: headers(),
-    }
+export async function getMedicineBatches(
+  id: string
+): Promise<Batch[]> {
+  const { data } = await api.get(
+    `/api/medicines/${id}/batches`
   );
 
-  if (!res.ok)
-    throw new Error("Unable to load batches");
-
-  return res.json();
+  return data;
 }
+
 export async function getBatches(
   medicineId: string
 ): Promise<Batch[]> {
@@ -43,28 +24,6 @@ export async function getBatches(
   );
 
   return data;
-}
-
-export async function updateBatch(
-
-    medicineId:string,
-
-    batchId:string,
-
-    request:CreateBatchRequest
-
-){
-
-    const {data}=await api.put(
-
-        `/medicines/${medicineId}/batches/${batchId}`,
-
-        request
-
-    );
-
-    return data;
-
 }
 
 export async function createBatch(
@@ -76,7 +35,27 @@ export async function createBatch(
     request
   );
 
-  
+  return data;
+}
+
+export async function updateBatch(
+  medicineId: string,
+  batchId: string,
+  request: CreateBatchRequest
+) {
+  const { data } = await api.put(
+    `/api/medicines/${medicineId}/batches/${batchId}`,
+    request
+  );
 
   return data;
+}
+
+export async function deleteBatch(
+  medicineId: string,
+  batchId: string
+) {
+  await api.delete(
+    `/api/medicines/${medicineId}/batches/${batchId}`
+  );
 }

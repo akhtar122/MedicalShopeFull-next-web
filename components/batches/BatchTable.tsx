@@ -1,31 +1,21 @@
 "use client";
 
 import { Pencil, Trash2 } from "lucide-react";
+
 import { Batch } from "@/types/batch";
+import StatusBadge from "@/components/common/StatusBadge";
 
 interface Props {
   batches: Batch[];
+  onEdit: (batch: Batch) => void;
+  onDelete: (id: string) => void;
 }
 
 export default function BatchTable({
   batches,
+  onEdit,
+  onDelete,
 }: Props) {
-    function onEdit(batch: Batch): void {
-      // Emit a custom event so parent components or pages can handle editing the batch.
-      // Detail contains the full batch object.
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("edit-batch", { detail: batch }));
-      }
-    }
-
-    function onDelete(id: string): void {
-      // Emit a custom event so parent components or pages can handle deleting the batch.
-      // Detail contains the batch id.
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("delete-batch", { detail: { id } }));
-      }
-    }
-
   return (
     <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
 
@@ -88,66 +78,105 @@ export default function BatchTable({
 
           )}
 
-          {batches.map(batch => (
+          {batches.map((batch) => {
 
-            <tr
-              key={batch.id}
-              className="border-t hover:bg-slate-50"
-            >
+            const expiry = new Date(batch.expiryDate);
 
-              <td className="px-6 py-4 font-medium">
-                {batch.batchNo}
-              </td>
+            const today = new Date();
 
-              <td>
-                {new Date(
-                  batch.expiryDate
-                ).toLocaleDateString()}
-              </td>
+            const diff = Math.ceil(
+              (expiry.getTime() - today.getTime()) /
+                (1000 * 60 * 60 * 24)
+            );
 
-              <td className="text-right">
-                ₹ {batch.purchasePrice}
-              </td>
+            return (
 
-              <td className="text-right">
-                ₹ {batch.sellingPrice}
-              </td>
+              <tr
+                key={batch.id}
+                className="border-t hover:bg-slate-50"
+              >
 
-              <td className="text-right font-semibold">
-                {batch.quantityAvailable}
-              </td>
+                <td className="px-6 py-4 font-medium">
+                  {batch.batchNo}
+                </td>
 
-              <td>
+                <td>
 
-                <div className="flex justify-center gap-3">
+                  <div className="flex flex-col gap-1">
 
-                  <button
-                   onClick={() => onEdit(batch)}
-                  >                      
-                    <Pencil
-                      size={18}
-                      className="text-blue-600 hover:text-blue-800"
-                    />
+                    <span>
+                      {expiry.toLocaleDateString()}
+                    </span>
 
-                  </button>
+                    {diff < 0 && (
+                      <StatusBadge
+                        color="red"
+                        text="Expired"
+                      />
+                    )}
 
-                  <button
-                  onClick={() => onDelete(batch.id)}>
+                    {diff >= 0 && diff <= 30 && (
+                      <StatusBadge
+                        color="orange"
+                        text="Expiring Soon"
+                      />
+                    )}
 
-                    <Trash2
-                      size={18}
-                      className="text-red-600 hover:text-red-800"
-                    />
+                    {diff > 30 && (
+                      <StatusBadge
+                        color="green"
+                        text="Good"
+                      />
+                    )}
 
-                  </button>
+                  </div>
 
-                </div>
+                </td>
 
-              </td>
+                <td className="text-right">
+                  ₹ {batch.purchasePrice.toFixed(2)}
+                </td>
 
-            </tr>
+                <td className="text-right">
+                  ₹ {batch.sellingPrice.toFixed(2)}
+                </td>
 
-          ))}
+                <td className="text-right font-semibold">
+                  {batch.quantityAvailable}
+                </td>
+
+                <td>
+
+                  <div className="flex justify-center gap-3">
+
+                    <button
+                      onClick={() => onEdit(batch)}
+                      className="rounded p-1 hover:bg-slate-100"
+                    >
+                      <Pencil
+                        size={18}
+                        className="text-blue-600"
+                      />
+                    </button>
+
+                    <button
+                      onClick={() => onDelete(batch.id)}
+                      className="rounded p-1 hover:bg-slate-100"
+                    >
+                      <Trash2
+                        size={18}
+                        className="text-red-600"
+                      />
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            );
+          })}
 
         </tbody>
 
