@@ -1,26 +1,41 @@
 "use client";
 
-import { useState } from "react";
-import { CreateBatchRequest } from "@/types/batch";
+import { useEffect, useState } from "react";
+import { Batch, CreateBatchRequest } from "@/types/batch";
 
 interface Props {
+  batch?: Batch | null;
   loading: boolean;
   onSubmit: (data: CreateBatchRequest) => Promise<void>;
 }
 
 export default function BatchForm({
+  batch,
   loading,
   onSubmit,
 }: Props) {
   const [form, setForm] =
     useState<CreateBatchRequest>({
-      batchNo: "",
-      expiryDate: "",
-      purchasePrice: 0,
-      sellingPrice: 0,
-      quantityReceived: 0,
-      quantityAvailable: 0,
+      batchNo: batch?.batchNo ?? "",
+      expiryDate: batch?.expiryDate?.substring(0, 10) ?? "",
+      purchasePrice: batch?.purchasePrice ?? 0,
+      sellingPrice: batch?.sellingPrice ?? 0,
+      quantityReceived: batch?.quantityReceived ?? 0,
+      quantityAvailable: batch?.quantityAvailable ?? 0,
     });
+
+  useEffect(() => {
+    if (!batch) return;
+
+    setForm({
+      batchNo: batch.batchNo,
+      expiryDate: batch.expiryDate.substring(0, 10),
+      purchasePrice: batch.purchasePrice,
+      sellingPrice: batch.sellingPrice,
+      quantityReceived: batch.quantityReceived,
+      quantityAvailable: batch.quantityAvailable,
+    });
+  }, [batch]);
 
   function change(
     e: React.ChangeEvent<HTMLInputElement>
@@ -54,6 +69,7 @@ export default function BatchForm({
         name="batchNo"
         placeholder="Batch No"
         className="w-full rounded border p-2"
+        value={form.batchNo}
         onChange={change}
       />
 
@@ -61,6 +77,7 @@ export default function BatchForm({
         type="date"
         name="expiryDate"
         className="w-full rounded border p-2"
+        value={form.expiryDate}
         onChange={change}
       />
 
@@ -69,6 +86,7 @@ export default function BatchForm({
         name="purchasePrice"
         placeholder="Purchase Price"
         className="w-full rounded border p-2"
+        value={form.purchasePrice}
         onChange={change}
       />
 
@@ -77,6 +95,7 @@ export default function BatchForm({
         name="sellingPrice"
         placeholder="Selling Price"
         className="w-full rounded border p-2"
+        value={form.sellingPrice}
         onChange={change}
       />
 
@@ -85,6 +104,7 @@ export default function BatchForm({
         name="quantityReceived"
         placeholder="Received Qty"
         className="w-full rounded border p-2"
+        value={form.quantityReceived}
         onChange={change}
       />
 
@@ -93,6 +113,7 @@ export default function BatchForm({
         name="quantityAvailable"
         placeholder="Available Qty"
         className="w-full rounded border p-2"
+        value={form.quantityAvailable}
         onChange={change}
       />
 

@@ -1,86 +1,114 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useBatches } from "@/hooks/useBatches";
-import MedicineInfoCard from "@/components/batches/MedicineInfoCard";
-import BatchTable from "@/components/batches/BatchTable";
-import AddBatchDialog from "@/components/batches/BatchDialog";
 import { useState } from "react";
 
+import { Batch } from "@/types/batch";
+
+import { useBatches } from "@/hooks/useBatches";
+
+import MedicineInfoCard from "@/components/batches/MedicineInfoCard";
+import BatchTable from "@/components/batches/BatchTable";
+import BatchDialog from "@/components/batches/BatchDialog";
+
+import { deleteBatch } from "@/services/batch.service";
 
 export default function BatchPage() {
-    const params = useParams();
-    const [open, setOpen] = useState(false);
-    const id = params.id as string;
+  const params = useParams();
+  const medicineId = params.id as string;
 
-    const {
-        medicine,
-        batches,
-        loading,
-        refresh,
-    } = useBatches(id);
+  const {
+    medicine,
+    batches,
+    loading,
+    refresh,
+  } = useBatches(medicineId);
 
-    if (loading)
-        return <div>Loading...</div>;
+  const [dialogOpen, setDialogOpen] =
+    useState(false);
 
-    function loadBatches(): void {
-        try {
-            
-            refresh();
-            // close dialog if open
-            setOpen(false);
-        } catch (e) {
-            // noop - keep UI stable on refresh errors
-            console.error(e);
-        }
-    }
+  const [selectedBatch, setSelectedBatch] =
+    useState<Batch | null>(null);
 
+  if (loading)
     return (
-        <div className="space-y-6">
-
-            <div>
-
-                <h1 className="text-2xl font-bold">
-                    Batch Management
-                </h1>
-
-                <p className="text-gray-500">
-                    {medicine.name}
-                </p>
-
-            </div>
-
-            <div className="rounded-xl border bg-white p-6">
-
-                <pre>
-                    <MedicineInfoCard medicine={medicine} />
-                </pre>
-
-            </div>
-            <div className="flex justify-end">
-
-                <button
-                    onClick={() => setOpen(true)}
-                    className="rounded-lg bg-blue-600 px-5 py-3 text-white"
-                >
-                    + Add Batch
-                </button>
-
-            </div>
-            <div className="rounded-xl border bg-white p-6">
-
-                <pre>
-                    <BatchTable batches={batches} />
-                </pre>
-
-            </div>
-            <AddBatchDialog
-                medicineId={id}
-                open={open}
-                onClose={() => setOpen(false)}
-                onSaved={loadBatches}
-            />
-
-        </div>
+      <div className="p-8">
+        Loading...
+      </div>
     );
+
+  async function handleDelete(
+    batchId: string
+  ) {
+    const ok = window.confirm(
+      "Delete this batch?"
+    );
+
+    if (!ok) return;
+
+    await deleteBatch(
+      medicineId,
+      batchId
+    );
+
+    refresh();
+  }
+
+  function handleEdit(batch: Batch) {
+    setSelectedBatch(batch);
+    setDialogOpen(true);
+  }
+
+  function handleAdd() {
+    setSelectedBatch(null);
+    setDialogOpen(true);
+  }
+
+  function handleSaved() {
+    setDialogOpen(false);
+    refresh();
+  }
+
+  return (
+    <div className="space-y-6">
+
+      <div>
+        <h1 className="text-2xl font-bold">
+          Batch Management
+        </h1>
+
+        <p className="text-gray-500">
+          {medicine.name}
+        </p>
+      </div>
+
+      <MedicineInfoCard medicine={medicine} />
+
+      <div className="flex justify-end">
+
+        <button
+          onClick={handleAdd}
+          className="rounded-lg bg-blue-600 px-5 py-3 text-white"
+        >
+          + Add Batch
+        </button>
+
+      </div>
+
+      <BatchTable
+        batches={batches}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+
+      <BatchDialog
+        medicineId={medicineId}
+        batch={selectedBatch}
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSaved={handleSaved}
+      />
+
+    </div>
+  );
 }
