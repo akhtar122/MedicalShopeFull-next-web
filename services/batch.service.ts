@@ -1,4 +1,5 @@
 import api from "@/lib/axios";
+import { InvoiceBatch } from "@/types/invoice";
 import { Batch, CreateBatchRequest } from "@/types/batch";
 
 export async function getMedicine(id: string) {
@@ -24,6 +25,19 @@ export async function getBatches(
   );
 
   return data;
+}
+export async function getInvoiceBatches(
+  medicineId: string
+): Promise<InvoiceBatch[]> {
+  const { data } = await api.get(
+    `/api/inventory/medicine/${medicineId}/batches`
+  );
+
+  return data.sort(
+    (a: InvoiceBatch, b: InvoiceBatch) =>
+      new Date(a.expiryDate).getTime() -
+      new Date(b.expiryDate).getTime()
+  );
 }
 
 export async function createBatch(

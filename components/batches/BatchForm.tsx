@@ -66,11 +66,12 @@ export default function BatchForm({
       className="space-y-4"
     >
       <input
-        name="batchNo"
+        name="batchNo" 
         placeholder="Batch No"
         className="w-full rounded border p-2"
         value={form.batchNo}
         onChange={change}
+        readOnly
       />
 
       <input
@@ -79,6 +80,7 @@ export default function BatchForm({
         className="w-full rounded border p-2"
         value={form.expiryDate}
         onChange={change}
+        readOnly
       />
 
       <input
@@ -88,6 +90,7 @@ export default function BatchForm({
         className="w-full rounded border p-2"
         value={form.purchasePrice}
         onChange={change}
+        readOnly
       />
 
       <input
@@ -97,6 +100,7 @@ export default function BatchForm({
         className="w-full rounded border p-2"
         value={form.sellingPrice}
         onChange={change}
+        readOnly
       />
 
       <input
@@ -106,6 +110,7 @@ export default function BatchForm({
         className="w-full rounded border p-2"
         value={form.quantityReceived}
         onChange={change}
+        readOnly
       />
 
       <input
@@ -115,14 +120,15 @@ export default function BatchForm({
         className="w-full rounded border p-2"
         value={form.quantityAvailable}
         onChange={change}
+        readOnly
       />
 
-      <button
+      {/* <button
         disabled={loading}
         className="w-full rounded bg-blue-600 p-3 text-white"
       >
         {loading ? "Saving..." : "Save Batch"}
-      </button>
+      </button> */}
     </form>
   );
 }
