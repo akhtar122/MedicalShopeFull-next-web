@@ -84,7 +84,7 @@ export default function BatchPage() {
 
       <MedicineInfoCard medicine={medicine} />
 
-      <div className="flex justify-end">
+      {/* <div className="flex justify-end">
 
         <button
           onClick={handleAdd}
@@ -93,7 +93,7 @@ export default function BatchPage() {
           + Add Batch
         </button>
 
-      </div>
+      </div> */}
 
       <BatchTable
         batches={batches}
