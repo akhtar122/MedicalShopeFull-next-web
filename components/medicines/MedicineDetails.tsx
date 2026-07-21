@@ -6,7 +6,7 @@ import { getMedicineById } from "@/services/medicine.service";
 import { Medicine } from "@/types/medicine";
 
 import BatchTable from "./BatchTable";
-import AddBatchDialog from "./AddBatchDialog";
+import AddBatchDialog from "../batches/BatchDialog";
 
 interface Props {
   medicineId: string;
@@ -18,6 +18,7 @@ export default function MedicineDetails({
 
   const [medicine, setMedicine] =
     useState<Medicine | null>(null);
+  const [open, setOpen] = useState(false);
 
   async function load() {
     const data =
@@ -95,14 +96,23 @@ export default function MedicineDetails({
 
       <div className="flex justify-end">
 
-        <AddBatchDialog
-          medicineId={medicineId}
-          onSuccess={load}
-        />
+        <button
+          onClick={() => setOpen(true)}
+          className="rounded-lg bg-blue-600 px-5 py-3 text-white"
+        >
+          + Add Batch
+        </button>
 
       </div>
 
       <BatchTable medicineId={medicineId} />
+
+      <AddBatchDialog
+        medicineId={medicineId}
+        open={open}
+        onClose={() => setOpen(false)}
+        onSaved={load}
+      />
 
     </div>
   );

@@ -15,3 +15,11 @@ export interface Batch {
     quantityAvailable:number;
 
 }
+export interface CreateBatchRequest {
+  batchNo: string;
+  expiryDate: string;
+  purchasePrice: number;
+  sellingPrice: number;
+  quantityReceived: number;
+  quantityAvailable: number;
+}

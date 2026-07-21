@@ -42,5 +42,6 @@ export const updateMedicine = async (
 export const deleteMedicine = async (
   id: string
 ) => {
+  console.log("Deleting medicine with ID:", id);
   await api.delete(`${BASE}/${id}`);
 };
