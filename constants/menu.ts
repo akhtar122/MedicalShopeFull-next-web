@@ -11,6 +11,7 @@ import {
   BarChart3,
   Settings,
   LayoutDashboard,
+  FileBarChart2,
 } from "lucide-react";
 const permission = usePermissions();
 export const menu = [
@@ -65,7 +66,7 @@ export const menu = [
   {
     title: "Reports",
     href: "/dashboard/reports",
-    icon: BarChart3,
+    icon: FileBarChart2,
     permission: "canViewReports",
   },
   {
