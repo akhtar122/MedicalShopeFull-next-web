@@ -12,6 +12,7 @@ export async function getInvoices(): Promise<Invoice[]> {
   return data;
 }
 
+
 export async function getInvoice(
   id: string
 ): Promise<InvoiceDetails> {
@@ -26,9 +27,7 @@ export async function deleteInvoice(
 ) {
   await api.delete(`/api/invoices/${id}`);
 }
-export async function searchMedicines(): Promise<
-  InvoiceMedicine[]
-> {
+export async function searchMedicines(): Promise<InvoiceMedicine[]> {
   const { data } = await api.get(
     "/api/medicines"
   );
