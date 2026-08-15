@@ -1,10 +1,15 @@
 export interface Invoice {
   id: string;
   invoiceNumber: string;
-  customerName: string;
+  customerId: string;
+  customerName?: string;
   invoiceDate: string;
-  paymentStatus: string;
+  subtotal: number;
+  gstTotal: number;
+  discount: number;
   grandTotal: number;
+  paymentStatus: string;
+  items: InvoiceItem[];
 }
 
 export interface InvoiceDetails {
@@ -45,15 +50,12 @@ export interface InvoiceItemDetails {
 export interface InvoiceItem {
   medicineId: string;
   medicineName: string;
-
+  medicineBatchId: string;
   batchNo: string;
-
+  expiryDate: string;
   quantity: number;
-
-  sellingPrice: number;
-
+  unitPrice: number;
   gstRate: number;
-
   lineTotal: number;
 }
 export interface InvoiceItemRequest {
