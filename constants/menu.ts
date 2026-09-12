@@ -11,7 +11,9 @@ import {
   BarChart3,
   Settings,
   LayoutDashboard,
-  FileBarChart2,  
+  FileBarChart2,
+  CreditCard,
+  Wallet,
 } from "lucide-react";
 const permission = usePermissions();
 export const menu = [
@@ -56,6 +58,16 @@ export const menu = [
     href: "/dashboard/invoices",
     icon: Receipt,
     permission: "canViewInvoices",
+  },
+  {
+    title: "Payments",
+    href: "/dashboard/payments",
+    icon: CreditCard,
+  },
+  {
+    title: "Outstanding",
+    href: "/dashboard/outstanding",
+    icon: Wallet,
   },
   {
     title: "Inventory",

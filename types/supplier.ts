@@ -1,8 +1,9 @@
-export interface Customer {
+export interface Supplier {
   id: string;
-  customerCode: string;
+  supplierCode: string;
   createdAt: string;
-  name: string;
+  companyName: string;
+  contactPerson: string;
   phone: string;
   email: string;
   gstNumber: string;
@@ -12,8 +13,9 @@ export interface Customer {
   pincode: string;
 }
 
-export interface CustomerRequest {
-  name: string;
+export interface SupplierRequest {
+  companyName: string;
+  contactPerson: string;
   phone: string;
   email: string;
   gstNumber: string;

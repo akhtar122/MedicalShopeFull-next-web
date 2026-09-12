@@ -1,8 +1,9 @@
 import api from "@/lib/axios";
-import { InvoiceMedicine } from "@/types/invoice";
 import {
+  CreateInvoiceRequest,
   Invoice,
   InvoiceDetails,
+  InvoiceMedicine,
 } from "@/types/invoice";
 
 export async function getInvoices(): Promise<Invoice[]> {
@@ -12,6 +13,17 @@ export async function getInvoices(): Promise<Invoice[]> {
   return data;
 }
 
+export async function createInvoice(
+  data: CreateInvoiceRequest
+): Promise<InvoiceDetails> {
+  const { data: createdInvoice } =
+    await api.post<InvoiceDetails>(
+      "/api/invoices",
+      data
+    );
+
+  return createdInvoice;
+}
 
 export async function getInvoice(
   id: string
@@ -27,6 +39,7 @@ export async function deleteInvoice(
 ) {
   await api.delete(`/api/invoices/${id}`);
 }
+
 export async function searchMedicines(): Promise<InvoiceMedicine[]> {
   const { data } = await api.get(
     "/api/medicines"
