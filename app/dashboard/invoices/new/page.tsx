@@ -11,8 +11,9 @@ import { useRouter } from "next/navigation";
 
 import SaveInvoiceBar from "@/components/invoices/SaveInvoiceBar";
 
-// import { createInvoice } from "@/services/invoice.service";
-import { createInvoice } from "@/services/customer.service";
+import {
+  createInvoice,
+} from "@/services/invoice.service";
 
 import { CreateInvoiceRequest } from "@/types/invoice";
 

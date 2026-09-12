@@ -41,6 +41,12 @@ const reports = [
     href: "/dashboard/reports/stock-history",
     icon: History,
   },
+  {
+  title: "Payment Report",
+  description: "View payment transactions and collections",
+  href: "/dashboard/reports/payments",
+  icon: BarChart3,
+}
 ];
 
 export default function ReportsPage() {

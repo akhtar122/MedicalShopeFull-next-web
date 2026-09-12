@@ -11,6 +11,7 @@ interface Props {
   open: boolean;
   invoiceId: string;
   invoiceTotal: number;
+  outstandingAmount: number;
   onClose: () => void;
   onSaved?: () => void;
 }
@@ -27,6 +28,7 @@ export default function PaymentDialog({
   open,
   invoiceId,
   invoiceTotal,
+  outstandingAmount,
   onClose,
   onSaved,
 }: Props) {
@@ -54,19 +56,32 @@ export default function PaymentDialog({
     setPaymentMethod("CASH");
 
     setAmount(
-      invoiceTotal.toFixed(2)
+      outstandingAmount.toFixed(2)
     );
 
-    setTransactionRef("");
+    // Temporary reference.
+    // Later we can make this proper UPI/UTR/card reference.
+    setTransactionRef(
+      `PAY-${Date.now()}`
+    );
 
-    setPaymentDate(
-      new Date()
+    const now = new Date();
+
+    const localDateTime =
+      new Date(
+        now.getTime() -
+          now.getTimezoneOffset() * 60000
+      )
         .toISOString()
-        .slice(0, 16)
-    );
+        .slice(0, 16);
+
+    setPaymentDate(localDateTime);
 
     setError(null);
-  }, [open, invoiceTotal]);
+  }, [
+    open,
+    outstandingAmount,
+  ]);
 
   if (!open) {
     return null;
@@ -93,9 +108,22 @@ export default function PaymentDialog({
       return;
     }
 
-    if (numericAmount > invoiceTotal) {
+    if (
+      numericAmount >
+      outstandingAmount
+    ) {
       setError(
-        "Payment amount cannot exceed the invoice total."
+        `Payment cannot exceed the outstanding balance of ₹${outstandingAmount.toFixed(
+          2
+        )}.`
+      );
+
+      return;
+    }
+
+    if (!transactionRef.trim()) {
+      setError(
+        "Transaction reference is required."
       );
 
       return;
@@ -109,20 +137,25 @@ export default function PaymentDialog({
         paymentMethod,
         amount: numericAmount,
         transactionRef:
-          transactionRef.trim() || undefined,
-        paymentDate: new Date(
-          paymentDate
-        ).toISOString(),
+          transactionRef.trim(),
+        paymentDate:
+          new Date(
+            paymentDate
+          ).toISOString(),
       });
 
       onSaved?.();
 
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
 
+      const message =
+        error?.response?.data?.message;
+
       setError(
-        "Unable to save payment."
+        message ||
+          "Unable to save payment."
       );
     } finally {
       setSaving(false);
@@ -134,7 +167,7 @@ export default function PaymentDialog({
 
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl">
 
-        {/* HEADER */}
+        {/* Header */}
 
         <div className="flex items-center justify-between border-b px-6 py-4">
 
@@ -143,9 +176,14 @@ export default function PaymentDialog({
               Record Payment
             </h2>
 
-            <p className="text-sm text-gray-500">
-              Invoice total: ₹{" "}
-              {invoiceTotal.toFixed(2)}
+            <p className="mt-1 text-sm text-gray-500">
+              Outstanding:{" "}
+              <span className="font-semibold text-red-600">
+                ₹
+                {outstandingAmount.toFixed(
+                  2
+                )}
+              </span>
             </p>
           </div>
 
@@ -159,17 +197,45 @@ export default function PaymentDialog({
 
         </div>
 
-        {/* FORM */}
+        {/* Form */}
 
         <form
           onSubmit={handleSubmit}
           className="space-y-5 p-6"
         >
 
-          {/* METHOD */}
+          {/* Invoice Summary */}
+
+          <div className="rounded-xl bg-slate-50 p-4">
+
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">
+                Invoice Total
+              </span>
+
+              <span className="font-medium">
+                ₹{invoiceTotal.toFixed(2)}
+              </span>
+            </div>
+
+            <div className="mt-2 flex justify-between text-sm">
+              <span className="text-gray-500">
+                Outstanding
+              </span>
+
+              <span className="font-semibold text-red-600">
+                ₹
+                {outstandingAmount.toFixed(
+                  2
+                )}
+              </span>
+            </div>
+
+          </div>
+
+          {/* Payment Method */}
 
           <div>
-
             <label className="mb-2 block text-sm font-medium">
               Payment Method
             </label>
@@ -197,21 +263,19 @@ export default function PaymentDialog({
                 )
               )}
             </select>
-
           </div>
 
-          {/* AMOUNT */}
+          {/* Amount */}
 
           <div>
-
             <label className="mb-2 block text-sm font-medium">
-              Amount
+              Payment Amount
             </label>
 
             <input
               type="number"
               min="0.01"
-              max={invoiceTotal}
+              max={outstandingAmount}
               step="0.01"
               value={amount}
               onChange={(e) =>
@@ -223,17 +287,19 @@ export default function PaymentDialog({
               required
             />
 
+            <p className="mt-1 text-xs text-gray-500">
+              Maximum: ₹
+              {outstandingAmount.toFixed(
+                2
+              )}
+            </p>
           </div>
 
-          {/* TRANSACTION REF */}
+          {/* Transaction Reference */}
 
           <div>
-
             <label className="mb-2 block text-sm font-medium">
               Transaction Reference
-              <span className="ml-1 text-gray-400">
-                (optional)
-              </span>
             </label>
 
             <input
@@ -244,18 +310,21 @@ export default function PaymentDialog({
                   e.target.value
                 )
               }
-              placeholder="UPI ID / transaction number"
+              placeholder="Enter transaction reference"
               className="w-full rounded-lg border px-3 py-2.5 outline-none focus:border-blue-500"
+              required
             />
 
+            <p className="mt-1 text-xs text-gray-500">
+              Temporary reference can be used for now.
+            </p>
           </div>
 
-          {/* DATE */}
+          {/* Payment Date */}
 
           <div>
-
             <label className="mb-2 block text-sm font-medium">
-              Payment Date
+              Payment Date & Time
             </label>
 
             <input
@@ -269,10 +338,9 @@ export default function PaymentDialog({
               className="w-full rounded-lg border px-3 py-2.5 outline-none focus:border-blue-500"
               required
             />
-
           </div>
 
-          {/* ERROR */}
+          {/* Error */}
 
           {error && (
             <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
@@ -280,7 +348,7 @@ export default function PaymentDialog({
             </div>
           )}
 
-          {/* BUTTONS */}
+          {/* Actions */}
 
           <div className="flex justify-end gap-3 border-t pt-5">
 
@@ -294,8 +362,11 @@ export default function PaymentDialog({
 
             <button
               type="submit"
-              disabled={saving}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={
+                saving ||
+                outstandingAmount <= 0
+              }
+              className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {saving
                 ? "Saving..."
@@ -307,7 +378,6 @@ export default function PaymentDialog({
         </form>
 
       </div>
-
     </div>
   );
 }

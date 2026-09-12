@@ -32,7 +32,7 @@ export default function PurchaseForm({
   initial,
   onSubmit,
 }: Props) {
-  const suppliers = useSuppliers();
+  const { suppliers } = useSuppliers();
   const router = useRouter();
 
   const { medicines } = useMedicines();
